@@ -13,9 +13,3 @@ create table round (
     season INTEGER not null,
     primary key (house_id, visitor_id, season)
 );
-
-create TABLE points (
-    team_id uuid not null references team(id),
-    points INTEGER not null default 0,
-    primary key (team_id)
-);

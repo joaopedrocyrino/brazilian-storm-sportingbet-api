@@ -2,7 +2,7 @@ import 'dotenv/config'
 import express, { Express, json, urlencoded, Request, Response } from 'express'
 import cors from 'cors'
 import { IRoute } from '../dto'
-import routes from '../services'
+import routes from '../routes'
 
 class ExpressServer {
     private readonly app: Express
@@ -25,18 +25,18 @@ class ExpressServer {
             this.app[method](route.route, async (req: Request, res: Response) => {
                 const requestQuery = req.query || {}
 
-                const query: { [key: string]: any } = {}
+                // const query: { [key: string]: any } = {}
 
-                Object.keys(requestQuery).forEach((k: string) => {
-                    // @ts-expect-error
-                    query[k] = JSON.parse(requestQuery[k])
-                })
+                // Object.keys(requestQuery).forEach((k: string) => {
+                //     // @ts-expect-error
+                //     query[k] = JSON.parse(requestQuery[k])
+                // })
 
                 const request = {
-                    ...(req.body || {}),
-                    query,
-                    params: (req.params || {}),
-                    jwtToken: req.header('auth')
+                    // ...(req.body || {}),
+                    ...requestQuery,
+                    // ...(req.params || {}),
+                    token: req.header('auth')
                 }
 
                 const { body, error, statusCode } = await route.handler.gateway(request)
@@ -45,7 +45,7 @@ class ExpressServer {
 
                 if (error) { response.error = error } else { response.body = body }
 
-                console.log(route.method, req.path, statusCode, '\nquery:', query, '\nparams', req.params)
+                console.log(route.method, req.path, statusCode, '\nquery:', requestQuery, '\nparams', req.params)
 
                 res.status(statusCode).json(response)
             })
